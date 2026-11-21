@@ -1,6 +1,6 @@
 from qdrant_client import QdrantClient, models
 
-from ticket_assistant.config import COLLECTION, QDRANT_URL, QUERY_PREFIX
+from ticket_assistant.config import COLLECTION, QDRANT_API_KEY, QDRANT_URL, QUERY_PREFIX
 from ticket_assistant.embeddings import load_model
 
 FILTER_FIELDS = {
@@ -8,6 +8,9 @@ FILTER_FIELDS = {
     "outcome_group", "is_resolved", "created_year", "source",
 }
 
+SEARCH_PARAMS = models.SearchParams(
+    quantization=models.QuantizationSearchParams(rescore=True, oversampling=3.0)
+)
 
 def build_filter(filters):
     if not filters:
@@ -26,7 +29,7 @@ def build_filter(filters):
 
 class Retriever:
     def __init__(self):
-        self.client = QdrantClient(url=QDRANT_URL, timeout=60)
+        self.client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY, timeout=60)
         self.model = load_model()
 
     def search(self, query, k=5, filters=None, per_ticket=2):
@@ -39,6 +42,7 @@ class Retriever:
             group_size=per_ticket,
             query_filter=build_filter(filters),
             with_payload=True,
+            search_params=SEARCH_PARAMS,
         )
         hits = []
         for group in result.groups:

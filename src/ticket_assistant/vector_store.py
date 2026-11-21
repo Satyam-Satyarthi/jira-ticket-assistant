@@ -3,7 +3,7 @@ import pandas as pd
 from qdrant_client import QdrantClient, models
 from tqdm import tqdm
 
-from ticket_assistant.config import CHUNKS, COLLECTION, INDEX_DIR, ISSUES_CSV, QDRANT_URL
+from ticket_assistant.config import CHUNKS, COLLECTION, INDEX_DIR, ISSUES_CSV, QDRANT_API_KEY, QDRANT_URL
 
 BATCH = 256
 DIMENSION = 384
@@ -24,7 +24,13 @@ def ensure_collection(client):
         return client.count(COLLECTION, exact=True).count
     client.create_collection(
         COLLECTION,
-        vectors_config=models.VectorParams(size=DIMENSION, distance=models.Distance.COSINE),
+        vectors_config=models.VectorParams(size=DIMENSION, distance=models.Distance.COSINE, on_disk=True),
+        quantization_config=models.ScalarQuantization(
+            scalar=models.ScalarQuantizationConfig(
+                type=models.ScalarType.INT8, quantile=0.99, always_ram=True
+            )
+        ),
+        on_disk_payload=True,
     )
     for field in KEYWORD_FIELDS:
         client.create_payload_index(COLLECTION, field, models.PayloadSchemaType.KEYWORD)
@@ -37,7 +43,7 @@ def main():
     rows = pd.read_json(CHUNKS, lines=True).to_dict("records")
     vectors = np.load(INDEX_DIR / "embeddings.npy")
     meta = load_meta()
-    client = QdrantClient(url=QDRANT_URL, timeout=120)
+    client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY, timeout=120)
     start = ensure_collection(client)
     for i in tqdm(range(start, len(rows), BATCH), desc="Uploading", unit="batch"):
         points = []
