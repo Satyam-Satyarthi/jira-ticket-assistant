@@ -23,7 +23,7 @@ def generate(question, hits):
         {"role": "user", "content": f"Tickets:\n{context_block(hits)}\n\nQuestion: {question}"},
     ]
     text, _ = chat(messages, max_tokens=500)
-    return DASH.sub(r"\1-\2", text.strip())
+    return DASH.sub(r"\1-\2", text.strip()).replace("【", "[").replace("】", "]")
 
 
 def check_citations(text, hits):

@@ -59,7 +59,11 @@ class Assistant:
             out = self.registry.get(name).run(standalone, self.context)
         except (ValueError, RuntimeError) as e:
             error = str(e)
-            out = {"agent": "error", "answer": f"I could not answer that: {error}", "sources": []}
+            out = {
+                "agent": "error",
+                "answer": f"I could not answer that: {error}. Please rephrase it, or ask one question at a time.",
+                "sources": [],
+            }
         out["trace_id"] = trace["trace_id"]
         finish(
             trace,
