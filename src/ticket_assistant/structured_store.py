@@ -1,6 +1,6 @@
 import duckdb
 
-from ticket_assistant.config import DUCKDB_PATH, ISSUES_CSV
+from ticket_assistant.config import DUCKDB_PATH, ISSUES_CSV, RAW_TEXT
 
 CATEGORICAL = ["project", "issue_type", "priority", "priority_group", "status", "resolution", "outcome_group"]
 NUMERIC = ["resolution_days", "open_age_days", "component_count", "priority_order", "created_year"]
@@ -10,6 +10,11 @@ GROUPABLE = CATEGORICAL + ["created_year"]
 METRICS = {"count", "avg", "median", "min", "max", "sum"}
 OPS = {"=", "!=", ">", ">=", "<", "<=", "in"}
 EXACT_ONLY = {"=", "!=", "in"}
+LIST_COLUMNS = [
+    "key", "summary", "project", "issue_type", "priority", "status", "resolution",
+    "created", "resolved", "resolution_days", "open_age_days", "component_count",
+]
+SORTABLE = ["created", "resolved", "resolution_days", "open_age_days", "component_count", "priority_order"]
 
 
 def build():
@@ -21,6 +26,14 @@ def build():
         "year(created) AS created_year "
         f"FROM read_csv_auto('{ISSUES_CSV.as_posix()}', header=true)"
     )
+    con.execute(
+        "CREATE TABLE issues_titled AS SELECT i.*, t.summary FROM issues i "
+        "LEFT JOIN (SELECT key, summary FROM read_json("
+        f"'{RAW_TEXT.as_posix()}', format='newline_delimited', columns={{key: 'VARCHAR', summary: 'VARCHAR'}})) t "
+        "USING (key)"
+    )
+    con.execute("DROP TABLE issues")
+    con.execute("ALTER TABLE issues_titled RENAME TO issues")
     con.close()
 
 
@@ -102,6 +115,37 @@ class Store:
         names = [d[0] for d in cur.description]
         rows = [dict(zip(names, r)) for r in cur.fetchall()]
         return {"sql": sql, "params": params, "rows": rows}
+
+    def select(self, spec):
+        columns = spec.get("columns") or ["key", "summary", "issue_type", "status", "created"]
+        for column in columns:
+            if column not in LIST_COLUMNS:
+                raise ValueError(f"cannot show column {column!r}")
+        order = spec.get("order_by")
+        if order and order not in SORTABLE:
+            raise ValueError(f"cannot sort by {order!r}")
+        direction = "ASC" if str(spec.get("order", "desc")).lower() == "asc" else "DESC"
+        try:
+            limit = min(max(int(spec.get("limit") or 10), 1), 50)
+        except (TypeError, ValueError) as e:
+            raise ValueError("limit must be a number") from e
+        filters = list(spec.get("filters", []))
+        if order == "resolution_days" and not any(f["column"] == "valid_for_duration" for f in filters):
+            filters.append({"column": "valid_for_duration", "op": "=", "value": True})
+        parts, params = self._where(filters)
+        where = " WHERE " + " AND ".join(parts) if parts else ""
+        sql = f"SELECT {', '.join(columns)} FROM issues{where}"
+        if order:
+            sql += f" ORDER BY {order} {direction} NULLS LAST, key"
+        sql += f" LIMIT {limit}"
+        cur = self.con.execute(sql, params)
+        names = [d[0] for d in cur.description]
+        rows = [
+            {n: (v.isoformat() if hasattr(v, "isoformat") else v) for n, v in zip(names, r)}
+            for r in cur.fetchall()
+        ]
+        total = self.con.execute(f"SELECT COUNT(*) FROM issues{where}", params).fetchone()[0]
+        return {"sql": sql, "params": params, "rows": rows, "columns": columns, "total": total}
 
 
 if __name__ == "__main__":

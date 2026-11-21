@@ -63,8 +63,8 @@ def render(plan, rows):
 class CountAgent(Agent):
     name = "count"
     description = (
-        "Exact numbers about tickets: counts, averages, medians, minimums, maximums or totals, "
-        "optionally per project, type, status, priority or year."
+        "Exact numbers about tickets answered as text: counts, averages, medians, minimums, maximums or totals, "
+        "optionally per project, type, status, priority or year. Not for charts or lists of tickets."
     )
 
     def run(self, question, context):
