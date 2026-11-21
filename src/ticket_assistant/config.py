@@ -29,3 +29,5 @@ NVIDIA_API_KEY = os.getenv("NVIDIA_API_KEY")
 NVIDIA_MODEL = os.getenv("NVIDIA_MODEL")
 HF_TOKEN = os.getenv("HF_TOKEN")
 HF_MODEL = os.getenv("HF_MODEL")
+LOG_PATH = Path("logs") / "requests.jsonl"
+DATABASE_URL = os.getenv("DATABASE_URL")

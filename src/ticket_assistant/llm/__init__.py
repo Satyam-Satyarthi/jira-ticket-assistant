@@ -2,6 +2,7 @@ import json
 import time
 
 from ticket_assistant.config import LLM_PROVIDERS
+from ticket_assistant.trace import record_llm
 from ticket_assistant.llm.providers import Gemini, Groq, Ollama, ProviderError, huggingface, mistral, nvidia
 
 REGISTRY = {
@@ -36,6 +37,7 @@ def chat(messages, json_mode=False, max_tokens=512):
             "latency": round(time.time() - start, 2),
             "fallbacks": errors,
         }
+        record_llm(meta)
         return text, meta
     raise RuntimeError("no LLM provider answered: " + "; ".join(errors))
 

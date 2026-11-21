@@ -36,11 +36,15 @@ def fix_filter(f, store):
             value = value.strip().lower() == "true"
         return {"column": column, "op": "=", "value": bool(value)}
     if column in NUMERIC:
+        cast = int if column == "created_year" else float
         try:
-            number = int(value) if column == "created_year" else float(value)
+            if isinstance(value, list):
+                return {"column": column, "op": "in", "value": [cast(v) for v in value]}
+            if op == "in":
+                return {"column": column, "op": "in", "value": [cast(value)]}
+            return {"column": column, "op": op, "value": cast(value)}
         except (TypeError, ValueError) as e:
             raise ValueError(f"{column} needs a number") from e
-        return {"column": column, "op": op, "value": number}
     raise ValueError(f"cannot filter on {column!r}")
 
 

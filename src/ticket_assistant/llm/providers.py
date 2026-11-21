@@ -49,6 +49,14 @@ class Groq:
         return bool(GROQ_API_KEY)
 
     def complete(self, messages, json_mode, max_tokens):
+        try:
+            return self.call(messages, json_mode, max_tokens)
+        except ProviderError as e:
+            if json_mode and "validate JSON" in str(e):
+                return self.call(messages, False, max_tokens)
+            raise
+
+    def call(self, messages, json_mode, max_tokens):
         body = {"model": self.model, "messages": messages, "temperature": 0, "max_tokens": max_tokens}
         if json_mode:
             body["response_format"] = {"type": "json_object"}
