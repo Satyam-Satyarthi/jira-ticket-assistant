@@ -65,6 +65,7 @@ class CountAgent(Agent):
     description = (
         "Exact numbers about tickets answered as text: counts, averages, medians, minimums, maximums or totals, "
         "optionally per project, type, status, priority or year. Not for charts or lists of tickets."
+        "Not for percentages, ratios or other calculations."
     )
 
     def run(self, question, context):
@@ -78,4 +79,4 @@ class CountAgent(Agent):
             "filters": clean_filters(raw.get("filters"), context.store),
         }
         out = context.store.query(plan)
-        return result(self, render(plan, out["rows"]), plan=plan, sql=out["sql"], params=out["params"])
+        return result(self, render(plan, out["rows"]), plan=plan, data=out["rows"], sql=out["sql"], params=out["params"])

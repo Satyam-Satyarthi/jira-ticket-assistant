@@ -102,7 +102,7 @@ class Store:
         group = spec.get("group_by")
         if group and group not in GROUPABLE:
             raise ValueError(f"cannot group by {group!r}")
-        limit = min(int(spec.get("limit", 20)), 50)
+        limit = min(int(spec.get("limit", 50)), 50)
         parts, params = self._where(filters)
         select = f"{group}, {expr} AS value" if group else f"{expr} AS value"
         sql = f"SELECT {select} FROM issues"

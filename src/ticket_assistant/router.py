@@ -7,7 +7,7 @@ The data behind this assistant is Apache Jira tickets of Kafka, Cassandra and Ha
 Agents:
 {agents}
 
-Choose the agent whose description fits best. Technical questions about Kafka, Cassandra or Hadoop belong to an agent that uses the tickets, even when the question does not mention tickets. Only questions unrelated to these systems belong to the general agent."""
+Choose the agent whose description fits best. Technical questions about Kafka, Cassandra, Hadoop or the systems around them (distributed storage, messaging, data processing, JVM engineering problems) belong to the rag agent, even when the question names no project and does not mention tickets. Questions that ask which tickets mention, add, introduce or discuss something belong to the rag agent, because they depend on what the tickets say. The table agent is only for lists chosen or ordered by ticket fields such as dates, status, type or resolution time. Only questions unrelated to these systems belong to the general agent. Questions that ask for a percentage, ratio, share, growth, difference or any other calculation belong to the analysis agent, even when they follow a count question. Questions that compare two groups, such as how many more or fewer, how much larger or smaller, or by how much, are calculations and belong to the analysis agent."""
 
 class Router:
     def __init__(self, registry):

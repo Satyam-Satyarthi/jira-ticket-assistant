@@ -7,7 +7,8 @@ FILTER_RULES = (
     'filters is a list of {"column", "op", "value"}. op is "=", "in", ">", ">=", "<" or "<=". '
     "Filterable columns: project, issue_type, priority_group, status, outcome_group, "
     "is_resolved (true or false), created_year (a number).\n"
-    "Add a filter only when the question states it. Never guess a filter."
+    "Add a filter only when the question states it. Never guess a filter. "
+    "When the question names a project (Kafka, Cassandra or Hadoop), always add a project filter for it."
 )
 
 

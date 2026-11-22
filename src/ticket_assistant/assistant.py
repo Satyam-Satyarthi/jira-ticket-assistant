@@ -75,4 +75,7 @@ class Assistant:
             error=error,
         )
         self.save(session_id, question, out, trace, first=not prior)
+        out["latency"] = trace["latency"]
+        out["tokens"] = trace["prompt_tokens"] + trace["completion_tokens"]
+        out["providers"] = [c["provider"] for c in trace["llm_calls"]]
         return out

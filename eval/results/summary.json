@@ -1,0 +1,47 @@
+{
+  "questions": 108,
+  "routing_accuracy": {
+    "overall": 0.972,
+    "count": 1.0,
+    "table": 1.0,
+    "chart": 1.0,
+    "rag": 1.0,
+    "general": 1.0,
+    "retrieval": 0.933,
+    "refusal": 0.833,
+    "math": 1.0
+  },
+  "count_exact_match": 1.0,
+  "table_exact_order": 1.0,
+  "table_mean_overlap": 1.0,
+  "chart_exact_match": 1.0,
+  "math_exact_match": 1.0,
+  "retrieval": {
+    "n": 30,
+    "hit@1": 0.733,
+    "hit@4": 0.867,
+    "hit@10": 0.967,
+    "mrr": 0.807,
+    "source_in_final_sources": 0.7,
+    "no_evidence_answers": 0.067
+  },
+  "refusal": {
+    "n": 6,
+    "refused": 1.0
+  },
+  "citations": {
+    "answered": 40,
+    "with_unverified_key": 0,
+    "without_any_citation": 0
+  },
+  "operations": {
+    "median_latency_s": 4.38,
+    "p95_latency_s": 6.89,
+    "mean_tokens_per_question": 1523,
+    "llm_calls_by_provider": {
+      "groq": 103,
+      "gemini": 158
+    },
+    "errors": 0
+  }
+}

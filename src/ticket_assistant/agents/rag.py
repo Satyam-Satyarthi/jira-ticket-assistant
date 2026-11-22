@@ -42,13 +42,14 @@ class RagAgent(Agent):
             raise ValueError("missing search query")
         filters = clean_filters(raw.get("filters"), context.store)
         plan = {"search_query": query, "filters": filters}
-        hits = context.retriever.search(query, k=TOP_K, filters=vector_filters(filters), per_ticket=1)
-        hits = [h for h in hits if h["score"] >= MIN_SCORE]
+        found = context.retriever.search(query, k=TOP_K, filters=vector_filters(filters), per_ticket=1)
+        retrieved = [{"key": h["key"], "score": round(h["score"], 3)} for h in found]
+        hits = [h for h in found if h["score"] >= MIN_SCORE]
         if not hits:
-            return result(self, NO_EVIDENCE, plan=plan, sources=[])
+            return result(self, NO_EVIDENCE, plan=plan, sources=[], retrieved=retrieved)
         text = generate(question, hits)
         cited, unverified = check_citations(text, hits)
         if unverified:
             text = strip_unverified(text, unverified)
         sources = [{"key": h["key"], "title": h["title"], "score": round(h["score"], 3)} for h in hits]
-        return result(self, text, plan=plan, sources=sources, cited=cited, unverified=unverified)
+        return result(self, text, plan=plan, sources=sources, retrieved=retrieved, cited=cited, unverified=unverified)
