@@ -1,4 +1,6 @@
+import time
 from qdrant_client import QdrantClient, models
+from qdrant_client.http.exceptions import ResponseHandlingException
 
 from ticket_assistant.config import COLLECTION, QDRANT_API_KEY, QDRANT_URL, QUERY_PREFIX
 from ticket_assistant.embeddings import load_model
@@ -26,6 +28,14 @@ def build_filter(filters):
         must.append(models.FieldCondition(key=field, match=match))
     return models.Filter(must=must)
 
+def retry(call, tries=3):
+    for attempt in range(tries):
+        try:
+            return call()
+        except (ResponseHandlingException, ConnectionError):
+            if attempt == tries - 1:
+                raise
+            time.sleep(2)
 
 class Retriever:
     def __init__(self):
@@ -34,7 +44,7 @@ class Retriever:
 
     def search(self, query, k=5, filters=None, per_ticket=2):
         vector = self.model.encode(QUERY_PREFIX + query, normalize_embeddings=True)
-        result = self.client.query_points_groups(
+        result = retry(lambda: self.client.query_points_groups(
             COLLECTION,
             query=vector.tolist(),
             group_by="key",
@@ -43,7 +53,7 @@ class Retriever:
             query_filter=build_filter(filters),
             with_payload=True,
             search_params=SEARCH_PARAMS,
-        )
+        ))
         hits = []
         for group in result.groups:
             for point in group.hits:

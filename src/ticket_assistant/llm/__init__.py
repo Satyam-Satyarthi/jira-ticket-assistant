@@ -3,15 +3,12 @@ import time
 
 from ticket_assistant.config import LLM_PROVIDERS
 from ticket_assistant.trace import record_llm
-from ticket_assistant.llm.providers import Gemini, Groq, Ollama, ProviderError, huggingface, mistral, nvidia
+from ticket_assistant.llm.providers import Gemini, Groq, Ollama, ProviderError
 
 REGISTRY = {
     "groq": Groq,
     "gemini": Gemini,
     "ollama": Ollama,
-    "mistral": mistral,
-    "nvidia": nvidia,
-    "huggingface": huggingface,
 }
 
 
@@ -19,13 +16,20 @@ def providers():
     chain = [REGISTRY[name.strip()]() for name in LLM_PROVIDERS if name.strip() in REGISTRY]
     return [p for p in chain if p.ready()]
 
+def attempt(provider, messages, json_mode, max_tokens):
+    try:
+        return provider.complete(messages, json_mode, max_tokens)
+    except ProviderError as e:
+        if "empty response" not in str(e):
+            raise
+    return provider.complete(messages, False, max_tokens * 3)
 
 def chat(messages, json_mode=False, max_tokens=512):
     errors = []
     for provider in providers():
         start = time.time()
         try:
-            text, prompt_tokens, completion_tokens = provider.complete(messages, json_mode, max_tokens)
+            text, prompt_tokens, completion_tokens = attempt(provider, messages, json_mode, max_tokens)
         except ProviderError as e:
             errors.append(f"{provider.name}: {e}")
             continue

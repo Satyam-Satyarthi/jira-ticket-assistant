@@ -7,13 +7,7 @@ from ticket_assistant.config import (
     GEMINI_MODEL,
     GROQ_API_KEY,
     GROQ_MODEL,
-    HF_MODEL,
-    HF_TOKEN,
     LLM_MODEL,
-    MISTRAL_API_KEY,
-    MISTRAL_MODEL,
-    NVIDIA_API_KEY,
-    NVIDIA_MODEL,
     OLLAMA_URL,
 )
 
@@ -129,37 +123,3 @@ class Ollama:
         text = require_text(data["message"]["content"])
         return text, data.get("prompt_eval_count"), data.get("eval_count")
 
-
-class Compat:
-    def __init__(self, name, url, key, model, json_mode=True):
-        self.name = name
-        self.url = url
-        self.key = key
-        self.model = model
-        self.json_mode = json_mode
-
-    def ready(self):
-        return bool(self.key and self.model)
-
-    def complete(self, messages, json_mode, max_tokens):
-        body = {"model": self.model, "messages": messages, "temperature": 0, "max_tokens": max_tokens}
-        if json_mode and self.json_mode:
-            body["response_format"] = {"type": "json_object"}
-        data = post(self.url, headers={"Authorization": f"Bearer {self.key}"}, json=body)
-        usage = data.get("usage", {})
-        text = require_text(data["choices"][0]["message"].get("content"))
-        return text, usage.get("prompt_tokens"), usage.get("completion_tokens")
-
-
-def mistral():
-    return Compat("mistral", "https://api.mistral.ai/v1/chat/completions", MISTRAL_API_KEY, MISTRAL_MODEL)
-
-
-def nvidia():
-    return Compat(
-        "nvidia", "https://integrate.api.nvidia.com/v1/chat/completions", NVIDIA_API_KEY, NVIDIA_MODEL, json_mode=False
-    )
-
-
-def huggingface():
-    return Compat("huggingface", "https://router.huggingface.co/v1/chat/completions", HF_TOKEN, HF_MODEL, json_mode=False)
