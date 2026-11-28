@@ -9,3 +9,4 @@ qdrant_storage/
 *.duckdb
 .pytest_cache/
 *.egg-info/
+logs/

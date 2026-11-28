@@ -1,4 +1,9 @@
+import os
 from pathlib import Path
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 DATA = Path("data")
 RAW_TEXT = DATA / "raw" / "tickets_text.jsonl"
@@ -9,6 +14,14 @@ DUCKDB_PATH = DATA / "processed" / "issues.duckdb"
 EMBED_MODEL = "BAAI/bge-small-en-v1.5"
 QUERY_PREFIX = "Represent this sentence for searching relevant passages: "
 COLLECTION = "jira_chunks"
-QDRANT_URL = "http://localhost:6333"
+QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
+QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GROQ_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+LLM_PROVIDERS = os.getenv("LLM_PROVIDERS", "groq,gemini").split(",")
 OLLAMA_URL = "http://localhost:11434"
 LLM_MODEL = "qwen2.5:7b-instruct"
+LOG_PATH = Path("logs") / "requests.jsonl"
+DATABASE_URL = os.getenv("DATABASE_URL")

@@ -1,0 +1,16 @@
+{"id": "math-001", "type": "math", "question": "What percentage of all issues are resolved?", "expected_agent": "analysis", "expected": 80.37}
+{"id": "math-002", "type": "math", "question": "What percentage of Hadoop issues are bugs?", "expected_agent": "analysis", "expected": 47.34}
+{"id": "math-003", "type": "math", "question": "What is the ratio of Kafka issues to Cassandra issues?", "expected_agent": "analysis", "expected": 0.93}
+{"id": "math-004", "type": "math", "question": "How many more Kafka issues are there than Hadoop issues?", "expected_agent": "analysis", "expected": 2301.0}
+{"id": "math-005", "type": "math", "question": "By how many days does the average resolution time of Hadoop bugs exceed that of Kafka bugs?", "expected_agent": "analysis", "expected": -26.48}
+{"id": "math-006", "type": "math", "question": "By what percentage did the number of Cassandra issues created change from 2022 to 2023?", "expected_agent": "analysis", "expected": 24.86}
+{"id": "math-007", "type": "math", "question": "What share of all issues does each project account for, in percent?", "expected_agent": "analysis", "expected": {"CASSANDRA": 36.35, "HADOOP": 29.88, "KAFKA": 33.77}}
+{"id": "math-008", "type": "math", "question": "What percentage of the issues of each project are bugs?", "expected_agent": "analysis", "expected": {"CASSANDRA": 54.22, "HADOOP": 47.34, "KAFKA": 45.43}}
+{"id": "math-009", "type": "math", "question": "What is the ratio of unresolved to resolved Cassandra issues?", "expected_agent": "analysis", "expected": 0.18}
+{"id": "math-010", "type": "math", "question": "What is the correlation between component count and resolution days across issues with valid durations?", "expected_agent": "analysis", "expected": 0.09}
+{"id": "math-011", "type": "math", "question": "How many fewer Hadoop issues are there than Cassandra issues?", "expected_agent": "analysis", "expected": 3827.0}
+{"id": "math-012", "type": "math", "question": "By what percentage did the number of Kafka issues created change from 2023 to 2024?", "expected_agent": "analysis", "expected": 52.78}
+{"id": "math-013", "type": "math", "question": "By how many days does the average resolution time of Kafka bugs exceed that of Cassandra bugs?", "expected_agent": "analysis", "expected": 93.5}
+{"id": "math-014", "type": "math", "question": "How many percentage points higher is the resolved share of Cassandra issues than that of Kafka issues?", "expected_agent": "analysis", "expected": 11.26}
+{"id": "math-015", "type": "math", "question": "What is the percentage change in Hadoop issues created between 2021 and 2022?", "expected_agent": "analysis", "expected": -13.95}
+{"id": "math-016", "type": "math", "question": "Compared with 2018, by what percentage did the number of Kafka issues created in 2019 change?", "expected_agent": "analysis", "expected": 15.31}
